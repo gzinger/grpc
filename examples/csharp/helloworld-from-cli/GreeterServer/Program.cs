@@ -27,7 +27,13 @@ namespace GreeterServer
             Console.WriteLine($"Got request from {request.Name}");
             return Task.FromResult(new HelloReply { Message = "Hello " + request.Name });
         }
+
+    public override Task<HelloReply> SayHelloAgain(HelloRequest request, ServerCallContext context)
+    {
+      Console.WriteLine($"Got Again request from {request.Name}");
+      return Task.FromResult(new HelloReply { Message = "Hello Again " + request.Name });
     }
+  }
 
     class Program
     {

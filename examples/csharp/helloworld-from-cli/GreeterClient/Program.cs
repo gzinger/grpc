@@ -49,14 +49,17 @@ namespace GreeterClient
 
     private static bool GetGreeting(Greeter.GreeterClient client, string sUser, out string sReply)
     {
+      sReply = string.Empty;
       try
       {
         var reply = client.SayHello(new HelloRequest { Name = sUser });
-        sReply= reply.Message;
+        sReply = $"1. {reply.Message}\r\n";
+        reply = client.SayHelloAgain(new HelloRequest { Name = sUser });
+        sReply += $"2. {reply.Message}";
         return true;
       }catch(Exception ex)
       {
-        sReply = ex.Message;
+        sReply += ex.Message;
         return false;
       }
     }
