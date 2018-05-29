@@ -18,21 +18,47 @@ using Helloworld;
 
 namespace GreeterClient
 {
-    class Program
+  class Program
+  {
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+      string sReply;
+      Channel channel = new Channel("127.0.0.1:50051", ChannelCredentials.Insecure);
+
+      var client = new Greeter.GreeterClient(channel);
+      while (true)
+      {
+        Console.WriteLine("Greeting. Please enter your name or empty line to exit: ");
+        string sUser = Console.ReadLine();
+        if (string.IsNullOrEmpty(sUser)) break;
+
+        if (GetGreeting(client, sUser, out sReply))
         {
-            Channel channel = new Channel("127.0.0.1:50051", ChannelCredentials.Insecure);
-
-            var client = new Greeter.GreeterClient(channel);
-            String user = "you";
-
-            var reply = client.SayHello(new HelloRequest { Name = user });
-            Console.WriteLine("Greeting: " + reply.Message);
-
-            channel.ShutdownAsync().Wait();
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+          Console.WriteLine("Greeting: " + sReply);
         }
+        else
+        {
+          Console.WriteLine("Error Connecting to server: " + sReply);
+        }
+      }
+
+      channel.ShutdownAsync().Wait();
+      Console.WriteLine("Press any key to exit...");
+      Console.ReadKey();
     }
+
+    private static bool GetGreeting(Greeter.GreeterClient client, string sUser, out string sReply)
+    {
+      try
+      {
+        var reply = client.SayHello(new HelloRequest { Name = sUser });
+        sReply= reply.Message;
+        return true;
+      }catch(Exception ex)
+      {
+        sReply = ex.Message;
+        return false;
+      }
+    }
+  }
 }
